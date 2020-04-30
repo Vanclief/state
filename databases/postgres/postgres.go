@@ -1,0 +1,213 @@
+package postgres
+
+import (
+	"fmt"
+
+	"github.com/go-pg/pg"
+	"github.com/go-pg/pg/orm"
+	"github.com/vanclief/ez"
+	"github.com/vanclief/state/object"
+)
+
+const (
+	// ETABLEEXISTS happens when a table already exists
+	ETABLEEXISTS = "ERROR #42P07"
+	// ENOROWS happens when no result was found
+	ENOROWS = "pg: no rows in result set"
+	// EMULTIPLEROWS happens when multiple results where found with QueryOne
+	EMULTIPLEROWS = "pg: multiple rows in result set"
+)
+
+// DB defines a PostgreSQL database will use pg as an orm
+type DB struct {
+	pg *pg.DB
+}
+
+// New returns a new Postgres Database instance
+func New(address string, user string, password string, database string) (*DB, error) {
+	db := pg.Connect(&pg.Options{
+		Addr:     address,
+		User:     user,
+		Password: password,
+		Database: database,
+	})
+
+	_, err := db.Exec("SELECT 1")
+
+	if err != nil {
+		fmt.Println(err)
+		db.Close()
+		return nil, err
+	}
+
+	return &DB{pg: db}, nil
+}
+
+// GetFromPKey returns a single model from the database using its primary key
+func (db *DB) GetFromPKey(m object.Model, ID string) error {
+	const op = "Postgres.DB.Get"
+
+	fmt.Println("db.model.before", m)
+	fmt.Println("db.model.before &", &m)
+
+	query := fmt.Sprintf(`SELECT * FROM %s WHERE %s = ?`, m.Schema().Name, m.Schema().PKey)
+
+	_, err := db.pg.QueryOne(m, query, ID)
+
+	fmt.Println("db.model.after", m)
+	fmt.Println("db.model.after &", &m)
+	if err != nil {
+		switch err.Error() {
+		case ENOROWS:
+			msg := fmt.Sprintf("Could not find a %s model with id %s", m.Schema().Name, ID)
+			return ez.New(op, ez.ENOTFOUND, msg, nil)
+		default:
+			return ez.New(op, ez.EINTERNAL, "Error making query to the database", err)
+		}
+	}
+
+	return nil
+}
+
+// QueryOne returns a single model from the database that satisfies a Query.
+// The method will return an error if there is more than one result from the query
+func (db *DB) QueryOne(m object.Model, query string) error {
+	const op = "Postgres.DB.QueryOne"
+
+	q := fmt.Sprintf(`SELECT * FROM %s WHERE %s`, m.Schema().Name, query)
+
+	_, err := db.pg.QueryOne(m, q, nil)
+	if err != nil {
+		switch err.Error() {
+		case ENOROWS:
+			msg := fmt.Sprintf("Could not find a %s model with query %s", m.Schema().Name, query)
+			return ez.New(op, ez.ENOTFOUND, msg, nil)
+		case EMULTIPLEROWS:
+			msg := fmt.Sprintf("Could find multiple %s models that satisfy QueryOne %s", m.Schema().Name, query)
+			return ez.New(op, ez.ECONFLICT, msg, nil)
+
+		default:
+			return ez.New(op, ez.EINTERNAL, "Error making query to the database", err)
+		}
+	}
+
+	return nil
+}
+
+// Query returns a list of models from the database that satisfy a Query.
+func (db *DB) Query(mList interface{}, model object.Model, query string) error {
+	const op = "Postgres.DB.Query"
+
+	q := fmt.Sprintf(`SELECT * FROM %s WHERE %s`, model.Schema().Name, query)
+
+	result, err := db.pg.Query(mList, q, nil)
+	if result.RowsReturned() == 0 {
+		msg := fmt.Sprintf("Could not find any %s with query %s", model.Schema().Name, query)
+		return ez.New(op, ez.ENOTFOUND, msg, nil)
+	}
+
+	if err != nil {
+		fmt.Println("err", err)
+		switch err.Error() {
+		case ENOROWS:
+			msg := fmt.Sprintf("Could not find a %s model with query %s", model.Schema().Name, query)
+			return ez.New(op, ez.ENOTFOUND, msg, nil)
+		default:
+			return ez.New(op, ez.EINTERNAL, "Error making query to the database", err)
+		}
+	}
+
+	return nil
+}
+
+// Insert adds a model into the database
+func (db *DB) Insert(m object.Model) error {
+	const op = "Postgres.DB.Insert"
+
+	err := db.pg.Insert(m)
+	if err != nil {
+		switch err.Error() {
+		default:
+			return ez.New(op, ez.EINTERNAL, "Error inserting to the database", err)
+		}
+	}
+
+	return nil
+}
+
+// Update changes an existing model from the database
+func (db *DB) Update(m object.Model) error {
+	const op = "Postgres.DB.Update"
+
+	err := db.pg.Update(m)
+	if err != nil {
+		switch err.Error() {
+		default:
+			return ez.New(op, ez.EINTERNAL, "Error updating from the database", err)
+		}
+	}
+
+	return nil
+}
+
+// Delete removes an existing model from the database
+func (db *DB) Delete(m object.Model) error {
+	const op = "Postgres.DB.Delete"
+
+	err := db.pg.Delete(m)
+	if err != nil {
+		switch err.Error() {
+		default:
+			return ez.New(op, ez.EINTERNAL, "Error deleting from the database", err)
+		}
+	}
+
+	return nil
+}
+
+// CreateSchema creates the database tables if dropExisting is set to true it will drop the current schema
+func (db *DB) CreateSchema(modelsList []interface{}, dropExisting bool) error {
+	const op = "Postgres.DB.CreateSchema"
+	for _, model := range modelsList {
+		if dropExisting {
+			err := db.DropTable(model)
+			if err != nil {
+				return ez.New(op, ez.ErrorCode(err), ez.ErrorMessage(err), err)
+			}
+		}
+		err := db.CreateTable(model)
+		if err != nil {
+			return ez.New(op, ez.ErrorCode(err), ez.ErrorMessage(err), err)
+		}
+	}
+	return nil
+}
+
+// CreateTable creates a new table in the database
+func (db *DB) CreateTable(model interface{}) error {
+	const op = "Postgres.DB.CreateTable"
+
+	err := db.pg.CreateTable(model, &orm.CreateTableOptions{
+		Temp: false,
+	})
+	if err != nil {
+		errorCode := err.Error()[0:12]
+		if errorCode != ETABLEEXISTS {
+			return ez.New(op, ez.EINTERNAL, "Could not create table", err)
+		}
+	}
+
+	return nil
+}
+
+// DropTable deletes the existing tables
+func (db *DB) DropTable(model interface{}) error {
+	const op = "Postgres.DB.DropTable"
+
+	err := db.pg.DropTable(model, &orm.DropTableOptions{})
+	if err != nil {
+		return ez.New(op, ez.EINTERNAL, "Could not drop table", err)
+	}
+
+	return nil
+}
