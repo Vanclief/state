@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/vanclief/state/caches/simplecache"
 	"github.com/vanclief/state/databases/postgres"
-	"github.com/vanclief/state/models/book"
-	user "github.com/vanclief/state/models/user"
+	"github.com/vanclief/state/examplemodels/book"
+	"github.com/vanclief/state/examplemodels/user"
 )
 
 func NewMockDatabase() DB {
