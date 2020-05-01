@@ -30,8 +30,6 @@ func New(db DB, cache Cache) (*State, error) {
 func (s *State) Get(model object.Model, query string) error {
 	const op = "State.Select"
 
-	fmt.Println("state.model.before", model)
-	fmt.Println("state.model.before &", &model)
 	var err error
 
 	if s.cache != nil {
@@ -39,9 +37,6 @@ func (s *State) Get(model object.Model, query string) error {
 	} else if s.db != nil {
 		err = s.db.GetFromPKey(model, query)
 	}
-
-	fmt.Println("state.model.after", model)
-	fmt.Println("state.model.after &", &model)
 
 	if err != nil {
 		return ez.New(op, ez.ErrorCode(err), ez.ErrorMessage(err), err)

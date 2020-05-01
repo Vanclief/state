@@ -4,6 +4,7 @@ package object
 type Model interface {
 	Schema() *Schema
 	GetID() string
+	Update(interface{}) error
 }
 
 // Schema defines the structure of the model for storage

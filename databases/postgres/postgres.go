@@ -47,15 +47,10 @@ func New(address string, user string, password string, database string) (*DB, er
 func (db *DB) GetFromPKey(m object.Model, ID string) error {
 	const op = "Postgres.DB.Get"
 
-	fmt.Println("db.model.before", m)
-	fmt.Println("db.model.before &", &m)
-
 	query := fmt.Sprintf(`SELECT * FROM %s WHERE %s = ?`, m.Schema().Name, m.Schema().PKey)
 
 	_, err := db.pg.QueryOne(m, query, ID)
 
-	fmt.Println("db.model.after", m)
-	fmt.Println("db.model.after &", &m)
 	if err != nil {
 		switch err.Error() {
 		case ENOROWS:

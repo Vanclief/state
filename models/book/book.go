@@ -1,6 +1,9 @@
 package book
 
-import "github.com/vanclief/state/object"
+import (
+	"github.com/vanclief/ez"
+	"github.com/vanclief/state/object"
+)
 
 type Book struct {
 	ID    string `json:"id"`
@@ -18,4 +21,16 @@ func (b *Book) Schema() *object.Schema {
 
 func (b *Book) GetID() string {
 	return b.ID
+}
+
+func (b *Book) Update(i interface{}) error {
+	const op = "Book.Update"
+
+	book, ok := i.(Book)
+	if !ok {
+		return ez.New(op, ez.EINVALID, "Provided interface is not of type Book", nil)
+	}
+
+	*b = book
+	return nil
 }

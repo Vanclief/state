@@ -1,6 +1,7 @@
 package user
 
 import (
+	"github.com/vanclief/ez"
 	"github.com/vanclief/state/object"
 )
 
@@ -24,4 +25,17 @@ func (u *User) Schema() *object.Schema {
 
 func (u *User) GetID() string {
 	return u.ID
+}
+
+func (u *User) Update(i interface{}) error {
+	const op = "User.Update"
+
+	user, ok := i.(*User)
+	if !ok {
+		return ez.New(op, ez.EINVALID, "Provided interface is not of type User", nil)
+	}
+
+	*u = *user
+
+	return nil
 }

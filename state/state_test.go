@@ -175,16 +175,8 @@ func TestGet(t *testing.T) {
 
 	// Should be able to get a model that exists
 	res := &user.User{}
-	fmt.Println("---------")
-	fmt.Println("res.before ", res)
-	fmt.Println("res.before &", &res)
 	err := state.Get(res, "1")
-	fmt.Println("res.after ", res)
-	fmt.Println("res.after &", &res)
-	fmt.Println("---------")
 	assert.Nil(t, err)
-
-	assert.NotNil(t, nil)
 
 	assert.Equal(t, user1.ID, res.ID)
 	assert.Equal(t, user1.Name, res.Name)

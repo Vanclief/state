@@ -20,8 +20,6 @@ func New() *Cache {
 // Get obtains a model from the cache
 func (c *Cache) Get(model object.Model, key string) error {
 	const op = "Simplecache.Cache.Get"
-	fmt.Println("cache.model.before", model)
-	fmt.Println("cache.model.before &", &model)
 
 	val, ok := c.memory[key]
 	if !ok {
@@ -29,14 +27,7 @@ func (c *Cache) Get(model object.Model, key string) error {
 		return ez.New(op, ez.ENOTFOUND, msg, nil)
 	}
 
-	// valOf := reflect.ValueOf(model)
-	// fmt.Println("val.before", valOf)
-	// valOf.Elem().Set(reflect.ValueOf(&val))
-	// fmt.Println("val.after", valOf)
-
-	model = val // This is fucked up
-	fmt.Println("cache.model.after", model)
-	fmt.Println("cache.model.after &", &model)
+	model.Update(val)
 
 	return nil
 }
