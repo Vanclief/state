@@ -19,7 +19,7 @@ func Fixture() *User {
 	return &User{ID: "1", Name: "Mock", Email: "mock@gmail.com"}
 }
 
-func (u *User) Schema() *object.Schema {
+func (u *User) GetSchema() *object.Schema {
 	return &object.Schema{Name: "users", PKey: "id"}
 }
 

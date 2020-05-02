@@ -2,7 +2,7 @@ package object
 
 // Model defines a struct with properties that should be part of the application state
 type Model interface {
-	Schema() *Schema
+	GetSchema() *Schema
 	GetID() string
 	Update(interface{}) error
 }

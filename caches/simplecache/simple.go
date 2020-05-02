@@ -21,7 +21,7 @@ func New() *Cache {
 func (c *Cache) Get(m object.Model, id string) error {
 	const op = "Simplecache.Cache.Get"
 
-	key := m.Schema().PKey + "-" + id
+	key := m.GetSchema().PKey + "-" + id
 	val, ok := c.memory[key]
 	if !ok {
 		msg := fmt.Sprintf("Object with key: %s was not found in the cache", key)
@@ -38,14 +38,14 @@ func (c *Cache) Get(m object.Model, id string) error {
 
 // Set adds a model to the cache
 func (c *Cache) Set(m object.Model) error {
-	key := m.Schema().PKey + "-" + m.GetID()
+	key := m.GetSchema().PKey + "-" + m.GetID()
 	c.memory[key] = m
 	return nil
 }
 
 // Delete removes a model from the cache
 func (c *Cache) Delete(m object.Model) error {
-	key := m.Schema().PKey + "-" + m.GetID()
+	key := m.GetSchema().PKey + "-" + m.GetID()
 	delete(c.memory, key)
 	return nil
 }

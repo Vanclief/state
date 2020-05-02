@@ -12,7 +12,7 @@ import (
 	"github.com/vanclief/state/examplemodels/user"
 )
 
-func NewTestDatabase() DB {
+func NewTestDatabase() Database {
 	const (
 		address  = "localhost:5432"
 		username = "vanclief"

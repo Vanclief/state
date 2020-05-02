@@ -9,14 +9,14 @@ import (
 
 // State defines an application state
 type State struct {
-	db             DB
+	db             Database
 	cache          Cache
 	stagedChanges  []*Change
 	appliedChanges []*Change
 }
 
 // New receives a DB and/or a Cache interface and returns a new state
-func New(db DB, cache Cache) (*State, error) {
+func New(db Database, cache Cache) (*State, error) {
 	const op = "State.New"
 
 	if db == nil && cache == nil {
@@ -38,7 +38,7 @@ func (s *State) Get(model object.Model, query string) error {
 	}
 
 	if s.db != nil && err != nil {
-		err = s.db.GetFromPKey(model, query)
+		err = s.db.Get(model, query)
 		fmt.Println("db", model)
 	}
 

@@ -15,7 +15,7 @@ func New(id, name, autor string) *Book {
 	return &Book{id, name, autor}
 }
 
-func (b *Book) Schema() *object.Schema {
+func (b *Book) GetSchema() *object.Schema {
 	return &object.Schema{Name: "books", PKey: "id"}
 }
 

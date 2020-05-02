@@ -43,18 +43,18 @@ func New(address string, user string, password string, database string) (*DB, er
 	return &DB{pg: db}, nil
 }
 
-// GetFromPKey returns a single model from the database using its primary key
-func (db *DB) GetFromPKey(m object.Model, ID string) error {
+// Get returns a single model from the database using its primary key
+func (db *DB) Get(m object.Model, ID string) error {
 	const op = "PG.DB.Get"
 
-	query := fmt.Sprintf(`SELECT * FROM %s WHERE %s = ?`, m.Schema().Name, m.Schema().PKey)
+	query := fmt.Sprintf(`SELECT * FROM %s WHERE %s = ?`, m.GetSchema().Name, m.GetSchema().PKey)
 
 	_, err := db.pg.QueryOne(m, query, ID)
 
 	if err != nil {
 		switch err.Error() {
 		case ENOROWS:
-			msg := fmt.Sprintf("Could not find a %s model with id %s", m.Schema().Name, ID)
+			msg := fmt.Sprintf("Could not find a %s model with id %s", m.GetSchema().Name, ID)
 			return ez.New(op, ez.ENOTFOUND, msg, nil)
 		default:
 			return ez.New(op, ez.EINTERNAL, "Error making query to the database", err)
@@ -69,16 +69,16 @@ func (db *DB) GetFromPKey(m object.Model, ID string) error {
 func (db *DB) QueryOne(m object.Model, query string) error {
 	const op = "PG.DB.QueryOne"
 
-	q := fmt.Sprintf(`SELECT * FROM %s WHERE %s`, m.Schema().Name, query)
+	q := fmt.Sprintf(`SELECT * FROM %s WHERE %s`, m.GetSchema().Name, query)
 
 	_, err := db.pg.QueryOne(m, q, nil)
 	if err != nil {
 		switch err.Error() {
 		case ENOROWS:
-			msg := fmt.Sprintf("Could not find a %s model with query %s", m.Schema().Name, query)
+			msg := fmt.Sprintf("Could not find a %s model with query %s", m.GetSchema().Name, query)
 			return ez.New(op, ez.ENOTFOUND, msg, nil)
 		case EMULTIPLEROWS:
-			msg := fmt.Sprintf("Could find multiple %s models that satisfy QueryOne %s", m.Schema().Name, query)
+			msg := fmt.Sprintf("Could find multiple %s models that satisfy QueryOne %s", m.GetSchema().Name, query)
 			return ez.New(op, ez.ECONFLICT, msg, nil)
 
 		default:
@@ -98,16 +98,16 @@ func (db *DB) Query(mList interface{}, model object.Model, query []string) error
 
 	switch len(query) {
 	case 1:
-		q = fmt.Sprintf(`SELECT * FROM %s WHERE %s`, model.Schema().Name, query[0])
+		q = fmt.Sprintf(`SELECT * FROM %s WHERE %s`, model.GetSchema().Name, query[0])
 	case 2:
-		q = fmt.Sprintf(`SELECT * FROM %s WHERE %s LIMIT %s`, model.Schema().Name, query[0], query[1])
+		q = fmt.Sprintf(`SELECT * FROM %s WHERE %s LIMIT %s`, model.GetSchema().Name, query[0], query[1])
 	default:
-		q = fmt.Sprintf(`SELECT * FROM %s WHERE %s LIMIT %s OFFSET %s`, model.Schema().Name, query[0], query[1], query[2])
+		q = fmt.Sprintf(`SELECT * FROM %s WHERE %s LIMIT %s OFFSET %s`, model.GetSchema().Name, query[0], query[1], query[2])
 	}
 
 	result, err := db.pg.Query(mList, q, nil)
 	if result.RowsReturned() == 0 {
-		msg := fmt.Sprintf("Could not find any %s with query %s", model.Schema().Name, q)
+		msg := fmt.Sprintf("Could not find any %s with query %s", model.GetSchema().Name, q)
 		return ez.New(op, ez.ENOTFOUND, msg, nil)
 	}
 
@@ -115,7 +115,7 @@ func (db *DB) Query(mList interface{}, model object.Model, query []string) error
 		fmt.Println("err", err)
 		switch err.Error() {
 		case ENOROWS:
-			msg := fmt.Sprintf("Could not find a %s model with query %s", model.Schema().Name, query)
+			msg := fmt.Sprintf("Could not find a %s model with query %s", model.GetSchema().Name, query)
 			return ez.New(op, ez.ENOTFOUND, msg, nil)
 		default:
 			return ez.New(op, ez.EINTERNAL, "Error making query to the database", err)

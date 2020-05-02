@@ -47,7 +47,7 @@ func NewChange(m object.Model, operation string) (*Change, error) {
 }
 
 // Apply applies a Change
-func (ch *Change) Apply(db DB, cache Cache) error {
+func (ch *Change) Apply(db Database, cache Cache) error {
 	const op = "Changes.Apply"
 
 	// Ignore changes that have been successfuly applied or reverted
@@ -122,7 +122,7 @@ func (ch *Change) Apply(db DB, cache Cache) error {
 }
 
 // Revert makes the oposite action of a change
-func (ch *Change) Revert(db DB, cache Cache) error {
+func (ch *Change) Revert(db Database, cache Cache) error {
 	const op = "Changes.Revert"
 
 	// Ignore changes that have not been successfuly applied
