@@ -1,4 +1,4 @@
-package postgres
+package pg
 
 import (
 	"fmt"
@@ -18,12 +18,12 @@ const (
 	EMULTIPLEROWS = "pg: multiple rows in result set"
 )
 
-// DB defines a PostgreSQL database will use pg as an orm
+// DB defines a PostgreSQL database that will use go-pg as an ORM
 type DB struct {
 	pg *pg.DB
 }
 
-// New returns a new Postgres Database instance
+// New returns a new PG Database instance
 func New(address string, user string, password string, database string) (*DB, error) {
 	db := pg.Connect(&pg.Options{
 		Addr:     address,
@@ -45,7 +45,7 @@ func New(address string, user string, password string, database string) (*DB, er
 
 // GetFromPKey returns a single model from the database using its primary key
 func (db *DB) GetFromPKey(m object.Model, ID string) error {
-	const op = "Postgres.DB.Get"
+	const op = "PG.DB.Get"
 
 	query := fmt.Sprintf(`SELECT * FROM %s WHERE %s = ?`, m.Schema().Name, m.Schema().PKey)
 
@@ -67,7 +67,7 @@ func (db *DB) GetFromPKey(m object.Model, ID string) error {
 // QueryOne returns a single model from the database that satisfies a Query.
 // The method will return an error if there is more than one result from the query
 func (db *DB) QueryOne(m object.Model, query string) error {
-	const op = "Postgres.DB.QueryOne"
+	const op = "PG.DB.QueryOne"
 
 	q := fmt.Sprintf(`SELECT * FROM %s WHERE %s`, m.Schema().Name, query)
 
@@ -92,7 +92,7 @@ func (db *DB) QueryOne(m object.Model, query string) error {
 // Query returns a list of models from the database that satisfy a Query, extra parameters
 // in the Query allow for Limit and Offset
 func (db *DB) Query(mList interface{}, model object.Model, query []string) error {
-	const op = "Postgres.DB.Query"
+	const op = "PG.DB.Query"
 
 	var q string
 
@@ -127,7 +127,7 @@ func (db *DB) Query(mList interface{}, model object.Model, query []string) error
 
 // Insert adds a model into the database
 func (db *DB) Insert(m object.Model) error {
-	const op = "Postgres.DB.Insert"
+	const op = "PG.DB.Insert"
 
 	err := db.pg.Insert(m)
 	if err != nil {
@@ -142,7 +142,7 @@ func (db *DB) Insert(m object.Model) error {
 
 // Update changes an existing model from the database
 func (db *DB) Update(m object.Model) error {
-	const op = "Postgres.DB.Update"
+	const op = "PG.DB.Update"
 
 	err := db.pg.Update(m)
 	if err != nil {
@@ -157,7 +157,7 @@ func (db *DB) Update(m object.Model) error {
 
 // Delete removes an existing model from the database
 func (db *DB) Delete(m object.Model) error {
-	const op = "Postgres.DB.Delete"
+	const op = "PG.DB.Delete"
 
 	err := db.pg.Delete(m)
 	if err != nil {
@@ -172,7 +172,7 @@ func (db *DB) Delete(m object.Model) error {
 
 // CreateSchema creates the database tables if dropExisting is set to true it will drop the current schema
 func (db *DB) CreateSchema(modelsList []interface{}, dropExisting bool) error {
-	const op = "Postgres.DB.CreateSchema"
+	const op = "PG.DB.CreateSchema"
 	for _, model := range modelsList {
 		if dropExisting {
 			err := db.DropTable(model)
@@ -190,7 +190,7 @@ func (db *DB) CreateSchema(modelsList []interface{}, dropExisting bool) error {
 
 // CreateTable creates a new table in the database
 func (db *DB) CreateTable(model interface{}) error {
-	const op = "Postgres.DB.CreateTable"
+	const op = "PG.DB.CreateTable"
 
 	err := db.pg.CreateTable(model, &orm.CreateTableOptions{
 		Temp: false,
@@ -207,7 +207,7 @@ func (db *DB) CreateTable(model interface{}) error {
 
 // DropTable deletes the existing tables
 func (db *DB) DropTable(model interface{}) error {
-	const op = "Postgres.DB.DropTable"
+	const op = "PG.DB.DropTable"
 
 	err := db.pg.DropTable(model, &orm.DropTableOptions{})
 	if err != nil {

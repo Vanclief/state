@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/vanclief/state/caches/simplecache"
-	"github.com/vanclief/state/databases/postgres"
+	"github.com/vanclief/state/databases/pg"
 	"github.com/vanclief/state/examplemodels/book"
 	"github.com/vanclief/state/examplemodels/user"
 )
@@ -21,7 +21,7 @@ func NewTestDatabase() DB {
 	)
 
 	// Create a new database connection
-	db, err := postgres.New(address, username, password, database)
+	db, err := pg.New(address, username, password, database)
 	if err != nil {
 		panic(err)
 	}
