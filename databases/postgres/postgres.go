@@ -89,15 +89,25 @@ func (db *DB) QueryOne(m object.Model, query string) error {
 	return nil
 }
 
-// Query returns a list of models from the database that satisfy a Query.
-func (db *DB) Query(mList interface{}, model object.Model, query string) error {
+// Query returns a list of models from the database that satisfy a Query, extra parameters
+// in the Query allow for Limit and Offset
+func (db *DB) Query(mList interface{}, model object.Model, query []string) error {
 	const op = "Postgres.DB.Query"
 
-	q := fmt.Sprintf(`SELECT * FROM %s WHERE %s`, model.Schema().Name, query)
+	var q string
+
+	switch len(query) {
+	case 1:
+		q = fmt.Sprintf(`SELECT * FROM %s WHERE %s`, model.Schema().Name, query[0])
+	case 2:
+		q = fmt.Sprintf(`SELECT * FROM %s WHERE %s LIMIT %s`, model.Schema().Name, query[0], query[1])
+	default:
+		q = fmt.Sprintf(`SELECT * FROM %s WHERE %s LIMIT %s OFFSET %s`, model.Schema().Name, query[0], query[1], query[2])
+	}
 
 	result, err := db.pg.Query(mList, q, nil)
 	if result.RowsReturned() == 0 {
-		msg := fmt.Sprintf("Could not find any %s with query %s", model.Schema().Name, query)
+		msg := fmt.Sprintf("Could not find any %s with query %s", model.Schema().Name, q)
 		return ez.New(op, ez.ENOTFOUND, msg, nil)
 	}
 

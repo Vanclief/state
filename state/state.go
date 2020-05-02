@@ -64,7 +64,7 @@ func (s *State) QueryOne(model object.Model, query string) error {
 }
 
 // Query searches for multiple models using a statement
-func (s *State) Query(mList interface{}, model object.Model, query string) error {
+func (s *State) Query(mList interface{}, model object.Model, query ...string) error {
 	const op = "State.Query"
 
 	if s.db != nil {

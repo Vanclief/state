@@ -1,7 +1,6 @@
 package state
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/vanclief/ez"
@@ -226,10 +225,12 @@ func TestQueryOne(t *testing.T) {
 func TestQuery(t *testing.T) {
 	// Test Setup
 	state := NewMockState()
-	user1 := user.New("1", "Franco", "franco@gmail.com")
-	user2 := user.New("2", "Franco", "vanclief@gmail.com")
+	user1 := user.New("1", "Franco", "email@francovalencia.com")
+	user2 := user.New("2", "Franco", "franco@gmail.com")
+	user3 := user.New("3", "Vanclief", "vanclief@vanclief.com")
 	state.Stage(user1, "insert")
 	state.Stage(user2, "insert")
+	state.Stage(user3, "insert")
 	state.Commit()
 
 	// Should be able to get a model that exists
@@ -249,8 +250,34 @@ func TestQuery(t *testing.T) {
 	// Should fail if there is no model that matches the query
 	res = []user.User{}
 	err = state.Query(&res, &user.User{}, `name = 'Francisco'`)
-	fmt.Println("res", res)
-	fmt.Println("err", err)
 	assert.NotNil(t, err)
 	assert.Equal(t, ez.ENOTFOUND, ez.ErrorCode(err))
+
+	// Should be able to use limit in the query
+	res = []user.User{}
+	err = state.Query(&res, &user.User{}, `name = 'Franco'`, "1")
+	assert.Nil(t, err)
+	assert.Len(t, res, 1)
+	assert.Equal(t, user1.ID, res[0].ID)
+	assert.Equal(t, user1.Name, res[0].Name)
+	assert.Equal(t, user1.Email, res[0].Email)
+
+	// Should be able to use limit and offset in the query
+	res = []user.User{}
+	err = state.Query(&res, &user.User{}, `name = 'Franco'`, "1", "1")
+	assert.Nil(t, err)
+	assert.Len(t, res, 1)
+	assert.Equal(t, user2.ID, res[0].ID)
+	assert.Equal(t, user2.Name, res[0].Name)
+	assert.Equal(t, user2.Email, res[0].Email)
+
+	// Should be able to use limit with order by in the query
+	res = []user.User{}
+	err = state.Query(&res, &user.User{}, `name = 'Franco' ORDER BY email DESC`, "1")
+	assert.Nil(t, err)
+	assert.Len(t, res, 1)
+	assert.Equal(t, user2.ID, res[0].ID)
+	assert.Equal(t, user2.Name, res[0].Name)
+	assert.Equal(t, user2.Email, res[0].Email)
+
 }
