@@ -28,7 +28,8 @@ type Change struct {
 	err    error
 }
 
-// NewChange creates a new Change struct
+// NewChange creates a new Change struct which is reponsible for tracking changes applied
+// to the application state
 func NewChange(m object.Model, operation string) (*Change, error) {
 	const op = "Changes.New"
 
@@ -46,7 +47,7 @@ func NewChange(m object.Model, operation string) (*Change, error) {
 	return &Change{model: m, op: operation, status: "pending"}, nil
 }
 
-// Apply applies a Change
+// Apply executes a pending change
 func (ch *Change) Apply(db Database, cache Cache) error {
 	const op = "Changes.Apply"
 
@@ -68,7 +69,7 @@ func (ch *Change) Apply(db Database, cache Cache) error {
 		}
 
 		if cache != nil {
-			err := cache.Set(ch.model)
+			err := cache.Set(ch.model, cache.GetTTL())
 			if err != nil {
 				ch.status = FAILURE
 				ch.err = err
@@ -88,7 +89,7 @@ func (ch *Change) Apply(db Database, cache Cache) error {
 		}
 
 		if cache != nil {
-			err := cache.Set(ch.model)
+			err := cache.Set(ch.model, cache.GetTTL())
 			if err != nil {
 				ch.status = FAILURE
 				ch.err = err
@@ -121,7 +122,7 @@ func (ch *Change) Apply(db Database, cache Cache) error {
 	return nil
 }
 
-// Revert makes the oposite action of a change
+// Revert executes the reverse action of a change, currently only supports insert
 func (ch *Change) Revert(db Database, cache Cache) error {
 	const op = "Changes.Revert"
 

@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/vanclief/state/caches/simplecache"
-	"github.com/vanclief/state/databases/pg"
+	pg "github.com/vanclief/state/databases/pgdb"
 	"github.com/vanclief/state/examplemodels/book"
 	"github.com/vanclief/state/examplemodels/user"
 )
@@ -171,7 +171,7 @@ func TestGet(t *testing.T) {
 	user1 := user.New("1", "Franco", "franco@gmail.com")
 	state.Stage(user1, "insert")
 	state.Commit()
-	state.Purge()
+	state.Cache.Purge()
 
 	// Should be able to get a model that exists
 	res := &user.User{}

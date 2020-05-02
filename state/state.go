@@ -9,13 +9,14 @@ import (
 
 // State defines an application state
 type State struct {
-	db             Database
-	cache          Cache
+	DB             Database
+	Cache          Cache
 	stagedChanges  []*Change
 	appliedChanges []*Change
 }
 
-// New receives a DB and/or a Cache interface and returns a new state
+// New creates a new Application State from storage. It supports using a Database
+// and a Cache or one of both.
 func New(db Database, cache Cache) (*State, error) {
 	const op = "State.New"
 
@@ -23,23 +24,23 @@ func New(db Database, cache Cache) (*State, error) {
 		return nil, ez.New(op, ez.EINVALID, "Creating a State requires at least a database or a cache", nil)
 	}
 
-	return &State{db: db, cache: cache}, nil
+	return &State{DB: db, Cache: cache}, nil
 }
 
-// Get obtains a model from the database using its ID
+// Get obtains a model from the database using its ID, will attempt to fetch it
+// first from Cache and then from Database
 func (s *State) Get(model object.Model, query string) error {
 	const op = "State.Select"
 
 	var err error
 
-	if s.cache != nil {
-		err = s.cache.Get(model, query)
-		fmt.Println("cache", model)
+	if s.Cache != nil {
+		err = s.Cache.Get(model, query)
 	}
 
-	if s.db != nil && err != nil {
-		err = s.db.Get(model, query)
-		fmt.Println("db", model)
+	if s.DB != nil && err != nil {
+		err = s.DB.Get(model, query)
+		// TODO: If found & err == nil add to cache
 	}
 
 	if err != nil {
@@ -49,12 +50,13 @@ func (s *State) Get(model object.Model, query string) error {
 	return nil
 }
 
-// QueryOne searches for a single model that satisfies a Query statement
+// QueryOne receives a model and a query. Will return a single model that
+// satifies the query.
 func (s *State) QueryOne(model object.Model, query string) error {
 	const op = "State.QueryTest"
 
-	if s.db != nil {
-		err := s.db.QueryOne(model, query)
+	if s.DB != nil {
+		err := s.DB.QueryOne(model, query)
 		if err != nil {
 			return ez.New(op, ez.ErrorCode(err), ez.ErrorMessage(err), err)
 		}
@@ -63,12 +65,13 @@ func (s *State) QueryOne(model object.Model, query string) error {
 	return nil
 }
 
-// Query searches for multiple models using a statement
+// Query receives a model and a query. Will return all models that satisfies the
+// query.
 func (s *State) Query(mList interface{}, model object.Model, query ...string) error {
 	const op = "State.Query"
 
-	if s.db != nil {
-		err := s.db.Query(mList, model, query)
+	if s.DB != nil {
+		err := s.DB.Query(mList, model, query)
 		if err != nil {
 			return ez.New(op, ez.ErrorCode(err), ez.ErrorMessage(err), err)
 		}
@@ -77,7 +80,7 @@ func (s *State) Query(mList interface{}, model object.Model, query ...string) er
 	return nil
 }
 
-// Stage setups a model for applying changes
+// Stage setups a model for changes, no change will be applied until State.Commit() is run
 func (s *State) Stage(model object.Model, operation string) error {
 	const op = "State.Stage"
 
@@ -90,7 +93,7 @@ func (s *State) Stage(model object.Model, operation string) error {
 	return nil
 }
 
-// Commit takes all staged changes and applies them
+// Commit applies all of the staged changes
 func (s *State) Commit() error {
 	const op = "State.Commit"
 
@@ -98,7 +101,7 @@ func (s *State) Commit() error {
 	s.appliedChanges = []*Change{}
 
 	for _, change := range s.stagedChanges {
-		err = change.Apply(s.db, s.cache)
+		err = change.Apply(s.DB, s.Cache)
 		if change.status == "success" {
 			s.appliedChanges = append(s.appliedChanges, change)
 		}
@@ -108,12 +111,11 @@ func (s *State) Commit() error {
 		return ez.New(op, ez.ECONFLICT, "One or more changes could not be commited", nil)
 	}
 
-	// If everything was ok, clear the current state
 	s.Clear()
 	return nil
 }
 
-// Rollback reverts the changes done in an Apply
+// Rollback reverts the latest applied changes for the insert operation
 func (s *State) Rollback() error {
 	const op = "State.Rollback"
 
@@ -122,7 +124,7 @@ func (s *State) Rollback() error {
 	s.appliedChanges = []*Change{}
 
 	for _, change := range rollbackChanges {
-		err = change.Revert(s.db, s.cache)
+		err = change.Revert(s.DB, s.Cache)
 		if change.status != "reverted" {
 			s.appliedChanges = append(s.appliedChanges, change)
 		}
@@ -135,7 +137,7 @@ func (s *State) Rollback() error {
 	return nil
 }
 
-// Clear removes all staged changes
+// Clear deletes the list of staged chanbes
 func (s *State) Clear() {
 	s.stagedChanges = []*Change{}
 }
@@ -155,16 +157,4 @@ func (s *State) PrintStatus() {
 	for _, change := range s.stagedChanges {
 		fmt.Println("Model:", change.model, "OP:", change.op, "Status:", change.status, "Error:", change.err)
 	}
-}
-
-// Purge clears the current cache
-func (s *State) Purge() error {
-	const op = "State.Purge"
-
-	err := s.cache.Purge()
-	if err != nil {
-		return ez.Wrap(op, err)
-	}
-
-	return nil
 }

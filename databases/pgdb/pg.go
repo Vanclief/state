@@ -1,4 +1,4 @@
-package pg
+package pgdb
 
 import (
 	"fmt"
@@ -35,7 +35,6 @@ func New(address string, user string, password string, database string) (*DB, er
 	_, err := db.Exec("SELECT 1")
 
 	if err != nil {
-		fmt.Println(err)
 		db.Close()
 		return nil, err
 	}

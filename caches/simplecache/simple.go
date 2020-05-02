@@ -37,7 +37,7 @@ func (c *Cache) Get(m object.Model, id string) error {
 }
 
 // Set adds a model to the cache
-func (c *Cache) Set(m object.Model) error {
+func (c *Cache) Set(m object.Model, ttl int) error {
 	key := m.GetSchema().PKey + "-" + m.GetID()
 	c.memory[key] = m
 	return nil
@@ -47,6 +47,18 @@ func (c *Cache) Set(m object.Model) error {
 func (c *Cache) Delete(m object.Model) error {
 	key := m.GetSchema().PKey + "-" + m.GetID()
 	delete(c.memory, key)
+	return nil
+}
+
+// GetTTL returns the Cache TTL
+func (c *Cache) GetTTL() int {
+	// Does not apply for simple cache
+	return 0
+}
+
+// SetTTL sets the Cache TTL
+func (c *Cache) SetTTL(ms int) error {
+	// Does not apply for simple cache
 	return nil
 }
 
