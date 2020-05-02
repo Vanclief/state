@@ -5,12 +5,9 @@ Minimalistic package for handling a Go application State with a Database and Cac
 
 * Use a single API to manage your application Database and Cache 
 
-* Git-like interface where you can stage changes, commit them and even revert them.
-
-* Embeded support for queries with pagination 
+* Git like interface where you stage changes, commit them and revert them.
 
 * Easily extended with other caches or databases, just need to implement a single interface
-
 
 ## Usage
 
@@ -97,14 +94,12 @@ fmt.Println(users[0]) // {"2", "John", "john@wick.com"}
 fmt.Println(users[1]) // {"3", "John", "john@cena.com"}
 ```
 
-
-### Model Interface
-Your model should implement the object.Model interface
+### Models 
+Your models should implement the object.Model interface, you can check 
+`examplemodels` to see how this is done.
 
 ### Database Interface
-Your database should implement the state.DB interface
+Your database should implement the `state.Database` interface, check the folder `databases` for examples.
 
 ### Cache Interface
-Your cache should implement the state.Cache interface
-
-
+Your cache should implement the `state.Cache` interface, check the folder `caches` for examples.
