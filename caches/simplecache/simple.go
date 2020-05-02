@@ -49,3 +49,9 @@ func (c *Cache) Delete(m object.Model) error {
 	delete(c.memory, key)
 	return nil
 }
+
+// Purge clears the cache
+func (c *Cache) Purge() error {
+	*c = Cache{map[string]object.Model{}}
+	return nil
+}

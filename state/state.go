@@ -34,8 +34,12 @@ func (s *State) Get(model object.Model, query string) error {
 
 	if s.cache != nil {
 		err = s.cache.Get(model, query)
-	} else if s.db != nil {
+		fmt.Println("cache", model)
+	}
+
+	if s.db != nil && err != nil {
 		err = s.db.GetFromPKey(model, query)
+		fmt.Println("db", model)
 	}
 
 	if err != nil {
@@ -151,4 +155,16 @@ func (s *State) PrintStatus() {
 	for _, change := range s.stagedChanges {
 		fmt.Println("Model:", change.model, "OP:", change.op, "Status:", change.status, "Error:", change.err)
 	}
+}
+
+// Purge clears the current cache
+func (s *State) Purge() error {
+	const op = "State.Purge"
+
+	err := s.cache.Purge()
+	if err != nil {
+		return ez.Wrap(op, err)
+	}
+
+	return nil
 }

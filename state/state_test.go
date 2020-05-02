@@ -172,6 +172,7 @@ func TestGet(t *testing.T) {
 	user1 := user.New("1", "Franco", "franco@gmail.com")
 	state.Stage(user1, "insert")
 	state.Commit()
+	state.Purge()
 
 	// Should be able to get a model that exists
 	res := &user.User{}

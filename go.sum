@@ -12,6 +12,8 @@ github.com/stretchr/testify v1.5.1 h1:nOGnQDM7FYENwehXlg/kFVnos3rEvtKTjRvOWSzb6H
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
 github.com/vanclief/ez v0.0.0-20200429185126-a891181015e9 h1:C2CvVoxEj6sB84nm+Bb1xlJ4BOY6wfV1eAaUxzJ9RK8=
 github.com/vanclief/ez v0.0.0-20200429185126-a891181015e9/go.mod h1:38LyomrMbieUKkf5XdDINHe3NrXv0oJ1qeJmrowaoqE=
+github.com/vanclief/ez v0.0.0-20200502134841-2d088a275ea5 h1:NgWC2+yHwhAVfYeJpkNDLFmNyaC7sO6c07CSbIVW2v4=
+github.com/vanclief/ez v0.0.0-20200502134841-2d088a275ea5/go.mod h1:38LyomrMbieUKkf5XdDINHe3NrXv0oJ1qeJmrowaoqE=
 golang.org/x/crypto v0.0.0-20180910181607-0e37d006457b h1:2b9XGzhjiYsYPnKXoEfL7klWZQIt8IfyRCz62gCqqlQ=
 golang.org/x/crypto v0.0.0-20180910181607-0e37d006457b/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
