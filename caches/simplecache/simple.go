@@ -18,28 +18,34 @@ func New() *Cache {
 }
 
 // Get obtains a model from the cache
-func (c *Cache) Get(model object.Model, key string) error {
+func (c *Cache) Get(m object.Model, id string) error {
 	const op = "Simplecache.Cache.Get"
 
+	key := m.Schema().PKey + "-" + id
 	val, ok := c.memory[key]
 	if !ok {
 		msg := fmt.Sprintf("Object with key: %s was not found in the cache", key)
 		return ez.New(op, ez.ENOTFOUND, msg, nil)
 	}
 
-	model.Update(val)
+	err := m.Update(val)
+	if err != nil {
+		return ez.New(op, ez.ECONFLICT, "Could not save retrieved object from cache", err)
+	}
 
 	return nil
 }
 
 // Set adds a model to the cache
 func (c *Cache) Set(m object.Model) error {
-	c.memory[m.GetID()] = m
+	key := m.Schema().PKey + "-" + m.GetID()
+	c.memory[key] = m
 	return nil
 }
 
 // Delete removes a model from the cache
 func (c *Cache) Delete(m object.Model) error {
-	delete(c.memory, m.GetID())
+	key := m.Schema().PKey + "-" + m.GetID()
+	delete(c.memory, key)
 	return nil
 }

@@ -13,7 +13,7 @@ import (
 	"github.com/vanclief/state/examplemodels/user"
 )
 
-func NewMockDatabase() DB {
+func NewTestDatabase() DB {
 	const (
 		address  = "localhost:5432"
 		username = "vanclief"
@@ -38,14 +38,14 @@ func NewMockDatabase() DB {
 	return db
 }
 
-func NewMockCache() Cache {
+func NewTestCache() Cache {
 	return simplecache.New()
 }
 
 func NewMockState() *State {
 	// DB Setup
-	db := NewMockDatabase()
-	cache := NewMockCache()
+	db := NewTestDatabase()
+	cache := NewTestCache()
 
 	state, err := New(db, cache)
 	if err != nil {
@@ -57,8 +57,8 @@ func NewMockState() *State {
 
 func TestNew(t *testing.T) {
 	// Test Setup
-	db := NewMockDatabase()
-	cache := NewMockCache()
+	db := NewTestDatabase()
+	cache := NewTestCache()
 
 	// Should be able to create a new State with a Database and No Cache
 	state, err := New(db, nil)
