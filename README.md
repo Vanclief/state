@@ -12,18 +12,19 @@ Minimalistic package for handling a Go application State with a Database and Cac
 ## Usage
 
 ### State API
-Import the library:
+
+**Import the library:**
 
 `import "github.com/vanclief/state"`
 
-Creating a new State:
+**Creating a new State:**
 ```
 state, err := New(db, cache) // Using both a Database and Cache
 state, err := New(db, nil) // Just using Database 
 state, err := New(nil, cache) // Just using Cache 
 ```
 
-Staging changes:
+**Staging changes:**
 ```
 i := user.New("1", "Franco", "email@francovalencia.com") // Your model here
 
@@ -33,7 +34,7 @@ state.Stage(d, "delete") // This stages User "d" to be deleted
 
 ```
 
-Commit changes:
+**Commit changes:**
 ```
 err := state.Commit() // Applies all staged changes
 if err != nil {
@@ -41,7 +42,7 @@ if err != nil {
 }
 ```
 
-Rollback applied insertions:
+**Rollback applied insertions:**
 ```
 err := state.Rollback() // Reverts applied "insert" changes
 if err != nil {
@@ -49,12 +50,12 @@ if err != nil {
 }
 ```
 
-Clear staged changes:
+**Clear staged changes:**
 ```
 state.Clear() // Clears all staged changes
 ```
 
-Display staged changes:
+**Display staged changes:**
 ```
 changes := state.Status() 
 for _, change := range changes {
@@ -63,7 +64,7 @@ for _, change := range changes {
 }
 ```
 
-Display applied changes:
+**Display applied changes:**
 ```
 applied := state.Applied() 
 for _, change := range applied {
@@ -72,27 +73,29 @@ for _, change := range applied {
 }
 ```
 
-Get a model using its ID:
+**Get a model using its ID:**
 ```
 u := &user.User{}
 state.Get(u, "1")
 fmt.Println(u) // {"1", "Franco", "email@francovalencia.com"}
 ```
 
-Query the database for a single model:
+**Query the database for a single model:**
 ```
 u := &user.User{}
 state.QueryOne(u, `email = 'email@francovalencia.com'`)
 fmt.Println(u) // {"1", "Franco", "email@francovalencia.com"}
 ```
+*Query format will depend of your database*
 
-Query the database for multiple models:
+**Query the database for multiple models:**
 ```
 users := []user.User{}
 state.QueryOne(users, , `name = 'John'`)
 fmt.Println(users[0]) // {"2", "John", "john@wick.com"}
 fmt.Println(users[1]) // {"3", "John", "john@cena.com"}
 ```
+*Query format will depend of your database*
 
 ### Models 
 Your models should implement the object.Model interface, you can check 
@@ -103,3 +106,6 @@ Your database should implement the `state.Database` interface, check the folder 
 
 ### Cache Interface
 Your cache should implement the `state.Cache` interface, check the folder `caches` for examples.
+
+## Contributions
+Feel free to open a PR or an Issue.
