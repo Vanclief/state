@@ -15,13 +15,13 @@ Minimalistic package for handling a Go application State with a Database and Cac
 
 **Import the library:**
 
-`import "github.com/vanclief/state"`
+`import "github.com/vanclief/state/manager"`
 
 **Creating a new State:**
 ```
-state, err := New(db, cache) // Using both a Database and Cache
-state, err := New(db, nil) // Just using Database 
-state, err := New(nil, cache) // Just using Cache 
+state, err := manager.New(db, cache) // Using both a Database and Cache
+state, err := manager.New(db, nil) // Just using Database 
+state, err := manager.New(nil, cache) // Just using Cache 
 ```
 
 **Staging changes:**
@@ -98,14 +98,14 @@ fmt.Println(users[1]) // {"3", "John", "john@cena.com"}
 *Query format will depend of your database*
 
 ### Models 
-Your models should implement the object.Model interface, you can check 
+Your models should implement the interfaces.Model interface, you can check 
 `examplemodels` to see how this is done.
 
 ### Database Interface
-Your database should implement the `state.Database` interface, check the folder `databases` for examples.
+Your database should implement the `interfaces.Database` interface, check the folder `databases` for examples.
 
 ### Cache Interface
-Your cache should implement the `state.Cache` interface, check the folder `caches` for examples.
+Your cache should implement the `interfaces.Cache` interface, check the folder `caches` for examples.
 
 ## Contributions
 Feel free to open a PR or an Issue.
