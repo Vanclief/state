@@ -1,8 +1,8 @@
-package state
+package manager
 
 import (
 	"github.com/vanclief/ez"
-	"github.com/vanclief/state/object"
+	"github.com/vanclief/state/interfaces"
 )
 
 // Operation codes
@@ -22,7 +22,7 @@ const (
 
 // Change defines the current state of a model that has been staged for changed
 type Change struct {
-	model  object.Model
+	model  interfaces.Model
 	op     string
 	status string
 	err    error
@@ -30,7 +30,7 @@ type Change struct {
 
 // NewChange creates a new Change struct which is reponsible for tracking changes applied
 // to the application state
-func NewChange(m object.Model, operation string) (*Change, error) {
+func NewChange(m interfaces.Model, operation string) (*Change, error) {
 	const op = "Changes.New"
 
 	ops := make(map[string]struct{})
@@ -48,7 +48,7 @@ func NewChange(m object.Model, operation string) (*Change, error) {
 }
 
 // Apply executes a pending change
-func (ch *Change) Apply(db Database, cache Cache) error {
+func (ch *Change) Apply(db interfaces.Database, cache interfaces.Cache) error {
 	const op = "Changes.Apply"
 
 	// Ignore changes that have been successfuly applied or reverted
@@ -123,7 +123,7 @@ func (ch *Change) Apply(db Database, cache Cache) error {
 }
 
 // Revert executes the reverse action of a change, currently only supports insert
-func (ch *Change) Revert(db Database, cache Cache) error {
+func (ch *Change) Revert(db interfaces.Database, cache interfaces.Cache) error {
 	const op = "Changes.Revert"
 
 	// Ignore changes that have not been successfuly applied

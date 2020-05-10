@@ -6,7 +6,7 @@ import (
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
 	"github.com/vanclief/ez"
-	"github.com/vanclief/state/object"
+	"github.com/vanclief/state/interfaces"
 )
 
 const (
@@ -43,7 +43,7 @@ func New(address string, user string, password string, database string) (*DB, er
 }
 
 // Get returns a single model from the database using its primary key
-func (db *DB) Get(m object.Model, ID string) error {
+func (db *DB) Get(m interfaces.Model, ID string) error {
 	const op = "PG.DB.Get"
 
 	query := fmt.Sprintf(`SELECT * FROM %s WHERE %s = ?`, m.GetSchema().Name, m.GetSchema().PKey)
@@ -65,7 +65,7 @@ func (db *DB) Get(m object.Model, ID string) error {
 
 // QueryOne returns a single model from the database that satisfies a Query.
 // The method will return an error if there is more than one result from the query
-func (db *DB) QueryOne(m object.Model, query string) error {
+func (db *DB) QueryOne(m interfaces.Model, query string) error {
 	const op = "PG.DB.QueryOne"
 
 	q := fmt.Sprintf(`SELECT * FROM %s WHERE %s`, m.GetSchema().Name, query)
@@ -90,7 +90,7 @@ func (db *DB) QueryOne(m object.Model, query string) error {
 
 // Query returns a list of models from the database that satisfy a Query, extra parameters
 // in the Query allow for Limit and Offset
-func (db *DB) Query(mList interface{}, model object.Model, query []string) error {
+func (db *DB) Query(mList interface{}, model interfaces.Model, query []string) error {
 	const op = "PG.DB.Query"
 
 	var q string
@@ -125,7 +125,7 @@ func (db *DB) Query(mList interface{}, model object.Model, query []string) error
 }
 
 // Insert adds a model into the database
-func (db *DB) Insert(m object.Model) error {
+func (db *DB) Insert(m interfaces.Model) error {
 	const op = "PG.DB.Insert"
 
 	err := db.pg.Insert(m)
@@ -140,7 +140,7 @@ func (db *DB) Insert(m object.Model) error {
 }
 
 // Update changes an existing model from the database
-func (db *DB) Update(m object.Model) error {
+func (db *DB) Update(m interfaces.Model) error {
 	const op = "PG.DB.Update"
 
 	err := db.pg.Update(m)
@@ -155,7 +155,7 @@ func (db *DB) Update(m object.Model) error {
 }
 
 // Delete removes an existing model from the database
-func (db *DB) Delete(m object.Model) error {
+func (db *DB) Delete(m interfaces.Model) error {
 	const op = "PG.DB.Delete"
 
 	err := db.pg.Delete(m)

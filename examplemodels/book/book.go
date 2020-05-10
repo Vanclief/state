@@ -2,7 +2,7 @@ package book
 
 import (
 	"github.com/vanclief/ez"
-	"github.com/vanclief/state/object"
+	"github.com/vanclief/state/interfaces"
 )
 
 type Book struct {
@@ -15,8 +15,8 @@ func New(id, name, autor string) *Book {
 	return &Book{id, name, autor}
 }
 
-func (b *Book) GetSchema() *object.Schema {
-	return &object.Schema{Name: "books", PKey: "id"}
+func (b *Book) GetSchema() *interfaces.Schema {
+	return &interfaces.Schema{Name: "books", PKey: "id"}
 }
 
 func (b *Book) GetID() string {

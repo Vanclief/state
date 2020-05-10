@@ -1,4 +1,4 @@
-package state
+package tests
 
 import (
 	"testing"
@@ -8,10 +8,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/vanclief/state/caches/redis"
 	"github.com/vanclief/state/examplemodels/user"
+	"github.com/vanclief/state/interfaces"
+	"github.com/vanclief/state/manager"
 )
 
-
-func NewTestRedisCache() Cache {
+func NewTestRedisCache() interfaces.Cache {
 	const (
 		address  = "localhost:6379"
 		password = ""
@@ -24,12 +25,12 @@ func NewTestRedisCache() Cache {
 	return cache
 }
 
-func NewMockStateWithRedis() *State {
+func NewMockManagerWithRedis() *manager.Manager {
 	// DB Setup
 	db := NewTestDatabase()
 	cache := NewTestRedisCache()
 
-	state, err := New(db, cache)
+	state, err := manager.New(db, cache)
 	if err != nil {
 		panic(err)
 	}
@@ -39,7 +40,7 @@ func NewMockStateWithRedis() *State {
 
 func TestGetwWithRedis(t *testing.T) {
 	// Test Setup
-	state := NewMockStateWithRedis()
+	state := NewMockManagerWithRedis()
 	user1 := user.New("1", "Franco", "franco@gmail.com")
 	state.Stage(user1, "insert")
 	state.Commit()
@@ -63,7 +64,7 @@ func TestGetwWithRedis(t *testing.T) {
 
 func TestQueryOneWithRedis(t *testing.T) {
 	// Test Setup
-	state := NewMockStateWithRedis()
+	state := NewMockManagerWithRedis()
 	user1 := user.New("1", "Franco", "franco@gmail.com")
 	state.Stage(user1, "insert")
 	state.Commit()
@@ -96,7 +97,7 @@ func TestQueryOneWithRedis(t *testing.T) {
 
 func TestQueryWithRedis(t *testing.T) {
 	// Test Setup
-	state := NewMockStateWithRedis()
+	state := NewMockManagerWithRedis()
 	user1 := user.New("1", "Franco", "email@francovalencia.com")
 	user2 := user.New("2", "Franco", "franco@gmail.com")
 	user3 := user.New("3", "Vanclief", "vanclief@vanclief.com")

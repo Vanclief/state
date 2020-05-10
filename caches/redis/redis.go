@@ -5,16 +5,16 @@ import (
 	"time"
 
 	"github.com/go-redis/redis"
-	"github.com/vanclief/state/object"
 	"github.com/vanclief/ez"
+	"github.com/vanclief/state/interfaces"
 )
 
 type RedisStorage struct {
-	Client     *redis.Client
-	ttl        int
+	Client *redis.Client
+	ttl    int
 }
 
-// NewClient instances a new redis client
+// New instances a new redis client
 func New(host, password string, db int) (*RedisStorage, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:     host,
@@ -36,12 +36,12 @@ func New(host, password string, db int) (*RedisStorage, error) {
 func newRedis(client *redis.Client) (*RedisStorage, error) {
 	// Return wrapper
 	return &RedisStorage{
-		Client:    client,
-		ttl:       1,
+		Client: client,
+		ttl:    1,
 	}, nil
 }
 
-func (s *RedisStorage) Get(m object.Model, id string) error {
+func (s *RedisStorage) Get(m interfaces.Model, id string) error {
 	key := m.GetSchema().PKey + "-" + id
 	value, err := s.Client.Get(key).Bytes()
 	if err == redis.Nil {
@@ -57,20 +57,20 @@ func (s *RedisStorage) Get(m object.Model, id string) error {
 	return nil
 }
 
-func (s *RedisStorage) Set(m object.Model, ttl int) error {
+func (s *RedisStorage) Set(m interfaces.Model, ttl int) error {
 	key := m.GetSchema().PKey + "-" + m.GetID()
 	encoded, err := json.Marshal(m)
 	if err != nil {
 		return err
 	}
-	err = s.Client.Set(key, encoded, time.Duration(ttl) * time.Millisecond).Err()
+	err = s.Client.Set(key, encoded, time.Duration(ttl)*time.Millisecond).Err()
 	if err != nil {
 		return ez.New("redis.Set", ez.EINTERNAL, "", err)
 	}
 	return nil
 }
 
-func (s *RedisStorage) Delete(m object.Model) error {
+func (s *RedisStorage) Delete(m interfaces.Model) error {
 	key := m.GetSchema().PKey + "-" + m.GetID()
 	err := s.Client.Del(key).Err()
 	if err != nil {
@@ -95,4 +95,3 @@ func (s *RedisStorage) SetTTL(ttl int) error {
 	s.ttl = ttl
 	return nil
 }
-

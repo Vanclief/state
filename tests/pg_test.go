@@ -1,4 +1,4 @@
-package state
+package tests
 
 import (
 	"testing"
@@ -10,9 +10,11 @@ import (
 	pg "github.com/vanclief/state/databases/pgdb"
 	"github.com/vanclief/state/examplemodels/book"
 	"github.com/vanclief/state/examplemodels/user"
+	"github.com/vanclief/state/interfaces"
+	"github.com/vanclief/state/manager"
 )
 
-func NewTestDatabase() Database {
+func NewTestDatabase() interfaces.Database {
 	const (
 		address  = "localhost:5432"
 		username = "vanclief"
@@ -37,16 +39,16 @@ func NewTestDatabase() Database {
 	return db
 }
 
-func NewTestCache() Cache {
+func NewTestCache() interfaces.Cache {
 	return simplecache.New()
 }
 
-func NewMockState() *State {
+func NewMockManager() *manager.Manager {
 	// DB Setup
 	db := NewTestDatabase()
 	cache := NewTestCache()
 
-	state, err := New(db, cache)
+	state, err := manager.New(db, cache)
 	if err != nil {
 		panic(err)
 	}
@@ -60,29 +62,29 @@ func TestNew(t *testing.T) {
 	cache := NewTestCache()
 
 	// Should be able to create a new State with a Database and No Cache
-	state, err := New(db, nil)
+	state, err := manager.New(db, nil)
 	assert.Nil(t, err)
 	assert.NotNil(t, state)
 
 	// Should be able to create a new state with Cache and no Database
-	state, err = New(nil, cache)
+	state, err = manager.New(nil, cache)
 	assert.Nil(t, err)
 	assert.NotNil(t, state)
 
 	// Should be able to create a new State with a Database and Cache
-	state, err = New(db, cache)
+	state, err = manager.New(db, cache)
 	assert.Nil(t, err)
 	assert.NotNil(t, state)
 
 	// Should NOT be able to create a new state without a Database or a Cache
-	state, err = New(nil, nil)
+	state, err = manager.New(nil, nil)
 	assert.NotNil(t, err)
 	assert.Nil(t, state)
 }
 
 func TestStage(t *testing.T) {
 	// Test Setup
-	state := NewMockState()
+	state := NewMockManager()
 	user := user.New("1", "Franco", "franco@gmail.com")
 
 	// Should be able to stage insert
@@ -101,7 +103,7 @@ func TestStage(t *testing.T) {
 
 func TestCommit(t *testing.T) {
 	// Test Setup
-	state := NewMockState()
+	state := NewMockManager()
 	user := user.New("1", "Franco", "franco@gmail.com")
 
 	// Should be able to apply insert
@@ -126,7 +128,7 @@ func TestCommit(t *testing.T) {
 
 func TestRollback(t *testing.T) {
 	// Test Setup
-	state := NewMockState()
+	state := NewMockManager()
 	user1 := user.New("1", "Franco", "franco@gmail.com")
 	book := book.New("1", "El master fuster", "Franco") // Book is not in the database schema
 
@@ -167,7 +169,7 @@ func TestRollback(t *testing.T) {
 
 func TestGet(t *testing.T) {
 	// Test Setup
-	state := NewMockState()
+	state := NewMockManager()
 	user1 := user.New("1", "Franco", "franco@gmail.com")
 	state.Stage(user1, "insert")
 	state.Commit()
@@ -191,7 +193,7 @@ func TestGet(t *testing.T) {
 
 func TestQueryOne(t *testing.T) {
 	// Test Setup
-	state := NewMockState()
+	state := NewMockManager()
 	user1 := user.New("1", "Franco", "franco@gmail.com")
 	state.Stage(user1, "insert")
 	state.Commit()
@@ -224,7 +226,7 @@ func TestQueryOne(t *testing.T) {
 
 func TestQuery(t *testing.T) {
 	// Test Setup
-	state := NewMockState()
+	state := NewMockManager()
 	user1 := user.New("1", "Franco", "email@francovalencia.com")
 	user2 := user.New("2", "Franco", "franco@gmail.com")
 	user3 := user.New("3", "Vanclief", "vanclief@vanclief.com")

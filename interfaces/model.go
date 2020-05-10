@@ -1,4 +1,4 @@
-package object
+package interfaces
 
 // Model defines a struct with properties that should be part of the application state
 type Model interface {

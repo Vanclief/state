@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/vanclief/ez"
-	"github.com/vanclief/state/object"
+	"github.com/vanclief/state/interfaces"
 )
 
 type User struct {
@@ -19,8 +19,8 @@ func Fixture() *User {
 	return &User{ID: "1", Name: "Mock", Email: "mock@gmail.com"}
 }
 
-func (u *User) GetSchema() *object.Schema {
-	return &object.Schema{Name: "users", PKey: "id"}
+func (u *User) GetSchema() *interfaces.Schema {
+	return &interfaces.Schema{Name: "users", PKey: "id"}
 }
 
 func (u *User) GetID() string {
