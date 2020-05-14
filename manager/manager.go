@@ -35,14 +35,20 @@ func (m *Manager) Get(model interfaces.Model, id interface{}) error {
 	const op = "Manager.Select"
 
 	var err error
+	var inCache bool
 
 	if m.Cache != nil {
 		m.log(op, "Source", "Cache", "ID", id)
+		inCache = true
+
 		err = m.Cache.Get(model, id)
-		m.logError(op, err, "Source", "Cache", "ID", id)
+		if err != nil {
+			m.logError(op, err, "Source", "Cache", "ID", id)
+			inCache = false
+		}
 	}
 
-	if m.DB != nil && err != nil {
+	if m.DB != nil && !inCache {
 		m.log(op, "Source", "DB", "ID", id)
 		err = m.DB.Get(model, id)
 		m.logError(op, err, "Source", "DB", "ID", id)
