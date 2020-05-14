@@ -55,7 +55,12 @@ func (db *DB) Get(m interfaces.Model, ID interface{}) error {
 
 	query := fmt.Sprintf(`SELECT * FROM %s WHERE %s = ?`, m.GetSchema().Name, m.GetSchema().PKey)
 
-	_, err := db.pg.QueryOne(m, query, ID)
+	res, err := db.pg.QueryOne(m, query, ID)
+
+	if res != nil && res.RowsReturned() < 1 {
+		msg := fmt.Sprintf("Could not find a %s model with id %s", m.GetSchema().Name, ID)
+		return ez.New(op, ez.ENOTFOUND, msg, nil)
+	}
 
 	if err != nil {
 		switch err.Error() {
