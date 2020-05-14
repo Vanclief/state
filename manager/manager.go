@@ -29,17 +29,17 @@ func New(db interfaces.Database, cache interfaces.Cache) (*Manager, error) {
 
 // Get obtains a model from the database using its ID, will attempt to fetch it
 // first from Cache and then from Database
-func (m *Manager) Get(model interfaces.Model, query string) error {
+func (m *Manager) Get(model interfaces.Model, id interface{}) error {
 	const op = "Manager.Select"
 
 	var err error
 
 	if m.Cache != nil {
-		err = m.Cache.Get(model, query)
+		err = m.Cache.Get(model, id)
 	}
 
 	if m.DB != nil && err != nil {
-		err = m.DB.Get(model, query)
+		err = m.DB.Get(model, id)
 		// TODO: If found & err == nil add to cache
 	}
 

@@ -43,8 +43,15 @@ func New(address string, user string, password string, database string) (*DB, er
 }
 
 // Get returns a single model from the database using its primary key
-func (db *DB) Get(m interfaces.Model, ID string) error {
+func (db *DB) Get(m interfaces.Model, ID interface{}) error {
 	const op = "PG.DB.Get"
+
+	switch ID.(type) {
+	case string:
+	case []byte:
+	default:
+		return ez.New(op, ez.EINVALID, "Can not use provided interface type", nil)
+	}
 
 	query := fmt.Sprintf(`SELECT * FROM %s WHERE %s = ?`, m.GetSchema().Name, m.GetSchema().PKey)
 

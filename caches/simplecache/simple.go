@@ -18,10 +18,21 @@ func New() *Cache {
 }
 
 // Get obtains a model from the cache
-func (c *Cache) Get(m interfaces.Model, id string) error {
+func (c *Cache) Get(m interfaces.Model, ID interface{}) error {
 	const op = "Simplecache.Cache.Get"
 
-	key := m.GetSchema().PKey + "-" + id
+	var id string
+
+	switch val := ID.(type) {
+	case string:
+		id = val
+	case []byte:
+		id = string(val)
+	default:
+		return ez.New(op, ez.EINVALID, "Can not use provided interface type", nil)
+	}
+
+	key := m.GetSchema().PKey + ":" + id
 	val, ok := c.memory[key]
 	if !ok {
 		msg := fmt.Sprintf("Object with key: %s was not found in the cache", key)
@@ -38,14 +49,14 @@ func (c *Cache) Get(m interfaces.Model, id string) error {
 
 // Set adds a model to the cache
 func (c *Cache) Set(m interfaces.Model, ttl int) error {
-	key := m.GetSchema().PKey + "-" + m.GetID()
+	key := m.GetSchema().PKey + ":" + m.GetID()
 	c.memory[key] = m
 	return nil
 }
 
 // Delete removes a model from the cache
 func (c *Cache) Delete(m interfaces.Model) error {
-	key := m.GetSchema().PKey + "-" + m.GetID()
+	key := m.GetSchema().PKey + ":" + m.GetID()
 	delete(c.memory, key)
 	return nil
 }

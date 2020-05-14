@@ -3,7 +3,7 @@ package interfaces
 // Database defines a persistent storage method
 type Database interface {
 	// Get returns a Model from the database using its ID as PK
-	Get(Model, string) error
+	Get(Model, interface{}) error
 	// QueryOne returns a Model from the database that satisfies a Query. Should
 	// return error if it finds more than one model that satisfies the Query
 	QueryOne(Model, string) error

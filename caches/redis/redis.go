@@ -41,7 +41,18 @@ func newRedis(client *redis.Client) (*RedisStorage, error) {
 	}, nil
 }
 
-func (s *RedisStorage) Get(m interfaces.Model, id string) error {
+func (s *RedisStorage) Get(m interfaces.Model, ID interface{}) error {
+	var id string
+
+	switch val := ID.(type) {
+	case string:
+		id = val
+	case []byte:
+		id = string(val)
+	default:
+		return ez.New("redis.Get", ez.EINVALID, "Can not use provided interface type", nil)
+	}
+
 	key := m.GetSchema().PKey + "-" + id
 	value, err := s.Client.Get(key).Bytes()
 	if err == redis.Nil {

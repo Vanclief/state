@@ -4,7 +4,7 @@ package interfaces
 type Cache interface {
 	// Get attempts to retrieve a model using its ID as Key, if found it
 	// updates with it the receiving Model.
-	Get(Model, string) error
+	Get(Model, interface{}) error
 	// Set adds a model  to the Cache using its ID as Key
 	Set(Model, int) error
 	// Delete destroys a model stored in the Cache
