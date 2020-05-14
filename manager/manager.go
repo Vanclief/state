@@ -3,6 +3,7 @@ package manager
 import (
 	"fmt"
 
+	log "github.com/inconshreveable/log15"
 	"github.com/vanclief/ez"
 	"github.com/vanclief/state/interfaces"
 )
@@ -13,6 +14,7 @@ type Manager struct {
 	Cache          interfaces.Cache
 	stagedChanges  []*Change
 	appliedChanges []*Change
+	logging        bool
 }
 
 // New creates a new Application State Manager from storage. It supports using a Database
@@ -35,13 +37,18 @@ func (m *Manager) Get(model interfaces.Model, id interface{}) error {
 	var err error
 
 	if m.Cache != nil {
+		m.log(op, "Source", "Cache", "ID", id)
 		err = m.Cache.Get(model, id)
+		m.logError(op, err, "Source", "Cache", "ID", id)
 	}
 
 	if m.DB != nil && err != nil {
+		m.log(op, "Source", "DB", "ID", id)
 		err = m.DB.Get(model, id)
-		// TODO: If found & err == nil add to cache
+		m.logError(op, err, "Source", "DB", "ID", id)
 	}
+
+	// TODO: If found in database and no error add to cache
 
 	if err != nil {
 		return ez.New(op, ez.ErrorCode(err), ez.ErrorMessage(err), err)
@@ -56,8 +63,11 @@ func (m *Manager) QueryOne(model interfaces.Model, query string) error {
 	const op = "Manager.QueryTest"
 
 	if m.DB != nil {
+		m.log(op, "Query", query)
+
 		err := m.DB.QueryOne(model, query)
 		if err != nil {
+			m.logError(op, err, "Source", "DB", "ID", query)
 			return ez.New(op, ez.ErrorCode(err), ez.ErrorMessage(err), err)
 		}
 	}
@@ -71,8 +81,11 @@ func (m *Manager) Query(mList interface{}, model interfaces.Model, query ...stri
 	const op = "Manager.Query"
 
 	if m.DB != nil {
+		m.log(op, "Query", query)
+
 		err := m.DB.Query(mList, model, query)
 		if err != nil {
+			m.logError(op, err, "Source", "DB", "ID", query)
 			return ez.New(op, ez.ErrorCode(err), ez.ErrorMessage(err), err)
 		}
 	}
@@ -84,8 +97,11 @@ func (m *Manager) Query(mList interface{}, model interfaces.Model, query ...stri
 func (m *Manager) Stage(model interfaces.Model, operation string) error {
 	const op = "Manager.Stage"
 
+	m.log(op, "Model", model.GetSchema(), "ID", model.GetID())
 	ch, err := NewChange(model, operation)
+
 	if err != nil {
+		m.logError(op, err, "Model", model.GetSchema(), "ID", model.GetID())
 		return ez.New(op, ez.EINVALID, "Failed to stage model for changes", err)
 	}
 
@@ -156,5 +172,23 @@ func (m *Manager) Applied() []*Change {
 func (m *Manager) PrintStatus() {
 	for _, change := range m.stagedChanges {
 		fmt.Println("Model:", change.model, "OP:", change.op, "Status:", change.status, "Error:", change.err)
+	}
+}
+
+// ToggleLogs enables or disables detailed logs
+func (m *Manager) ToggleLogs() {
+	m.logging = !m.logging
+}
+
+func (m *Manager) log(op string, ctx ...interface{}) {
+	if m.logging {
+		log.Info(op, ctx...)
+	}
+}
+
+func (m *Manager) logError(op string, err error, ctx ...interface{}) {
+	if m.logging && err != nil {
+		ctx = append(ctx, "Error", ez.ErrorMessage(err))
+		log.Info(op, ctx...)
 	}
 }

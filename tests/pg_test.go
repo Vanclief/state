@@ -170,6 +170,7 @@ func TestRollback(t *testing.T) {
 func TestGet(t *testing.T) {
 	// Test Setup
 	state := NewMockManager()
+	state.ToggleLogs()
 	user1 := user.New("1", "Franco", "franco@gmail.com")
 	state.Stage(user1, "insert")
 	state.Commit()
