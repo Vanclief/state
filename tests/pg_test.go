@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/vanclief/ez"
@@ -178,17 +177,15 @@ func TestGet(t *testing.T) {
 
 	// Should be able to get a model that exists
 	res := &user.User{}
-	fmt.Println("first get")
 	err := state.Get(res, "1")
 	assert.Nil(t, err)
 
-	assert.Equal(t, user1.ID, res.ID)
-	assert.Equal(t, user1.Name, res.Name)
-	assert.Equal(t, user1.Email, res.Email)
+	assert.Equal(t, "1", res.ID)
+	assert.Equal(t, "Franco", res.Name)
+	assert.Equal(t, "franco@gmail.com", res.Email)
 
 	// Should not be able to get a model that doesnt exist
 	res = &user.User{}
-	fmt.Println("second get")
 	err = state.Get(res, "31231")
 	assert.NotNil(t, err)
 	assert.Equal(t, ez.ENOTFOUND, ez.ErrorCode(err))
