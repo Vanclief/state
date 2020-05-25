@@ -3,8 +3,8 @@ package pgdb
 import (
 	"fmt"
 
-	"github.com/go-pg/pg"
-	"github.com/go-pg/pg/orm"
+	"github.com/go-pg/pg/v9"
+	"github.com/go-pg/pg/v9/orm"
 	"github.com/vanclief/ez"
 	"github.com/vanclief/state/interfaces"
 )
