@@ -66,7 +66,7 @@ func (m *Manager) Get(model interfaces.Model, id interface{}) error {
 // QueryOne receives a model and a query. Will return a single model that
 // satifies the query.
 func (m *Manager) QueryOne(model interfaces.Model, query string) error {
-	const op = "Manager.QueryTest"
+	const op = "Manager.QueryOne"
 
 	if m.DB != nil {
 		m.log(op, "Query", query)
