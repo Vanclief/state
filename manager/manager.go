@@ -130,7 +130,7 @@ func (m *Manager) Commit() error {
 	}
 
 	if err != nil {
-		return ez.New(op, ez.ECONFLICT, "One or more changes could not be commited", nil)
+		return ez.New(op, ez.ECONFLICT, "One or more changes could not be commited", err)
 	}
 
 	m.Clear()

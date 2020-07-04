@@ -123,7 +123,6 @@ func (db *DB) Query(mList interface{}, model interfaces.Model, query []string) e
 	}
 
 	if err != nil {
-		fmt.Println("err", err)
 		switch err.Error() {
 		case ENOROWS:
 			msg := fmt.Sprintf("Could not find a %s model with query %s", model.GetSchema().Name, query)
