@@ -9,5 +9,5 @@ require (
 	github.com/inconshreveable/log15 v0.0.0-20200109203555-b30bc20e4fd1
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/stretchr/testify v1.5.1
-	github.com/vanclief/ez v0.0.0-20200502134841-2d088a275ea5
+	github.com/vanclief/ez v1.1.3
 )
