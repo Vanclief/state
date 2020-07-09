@@ -117,12 +117,7 @@ func (db *DB) Query(mList interface{}, model interfaces.Model, query []string) e
 	}
 
 	result, err := db.pg.Query(mList, q, nil)
-	if result.RowsReturned() == 0 {
-		msg := fmt.Sprintf("Could not find any %s with query %s", model.GetSchema().Name, q)
-		return ez.New(op, ez.ENOTFOUND, msg, nil)
-	}
-
-	if err != nil {
+	if err != nil || result == nil {
 		switch err.Error() {
 		case ENOROWS:
 			msg := fmt.Sprintf("Could not find a %s model with query %s", model.GetSchema().Name, query)
@@ -130,6 +125,12 @@ func (db *DB) Query(mList interface{}, model interfaces.Model, query []string) e
 		default:
 			return ez.New(op, ez.EINTERNAL, "Error making query to the database", err)
 		}
+	}
+
+	if result.RowsReturned() == 0 {
+		fmt.Println("we dont get here right?")
+		msg := fmt.Sprintf("Could not find any %s with query %s", model.GetSchema().Name, q)
+		return ez.New(op, ez.ENOTFOUND, msg, nil)
 	}
 
 	return nil

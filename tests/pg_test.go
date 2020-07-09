@@ -250,6 +250,12 @@ func TestQuery(t *testing.T) {
 	assert.Equal(t, user2.Name, res[1].Name)
 	assert.Equal(t, user2.Email, res[1].Email)
 
+	// Should fail if the query is invalid
+	res = []user.User{}
+	err = state.Query(&res, &user.User{}, `default default default`)
+	assert.NotNil(t, err)
+	assert.Equal(t, ez.EINTERNAL, ez.ErrorCode(err))
+
 	// Should fail if there is no model that matches the query
 	res = []user.User{}
 	err = state.Query(&res, &user.User{}, `name = 'Francisco'`)
