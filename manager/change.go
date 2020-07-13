@@ -63,7 +63,7 @@ func (ch *Change) Apply(db interfaces.Database, cache interfaces.Cache) error {
 			if err != nil {
 				ch.status = FAILURE
 				ch.err = err
-				return ez.New(op+".INSERT", ez.EINTERNAL, "Database: Could apply insert operation", err)
+				return ez.New(op+".INSERT", ez.EINTERNAL, "Database: Could not apply insert operation", err)
 			}
 			ch.status = SUCCESS
 		}
@@ -73,7 +73,7 @@ func (ch *Change) Apply(db interfaces.Database, cache interfaces.Cache) error {
 			if err != nil {
 				ch.status = FAILURE
 				ch.err = err
-				return ez.New(op+".INSERT", ez.EINTERNAL, "Cache: Could apply set operation", err)
+				return ez.New(op+".INSERT", ez.EINTERNAL, "Cache: Could not apply set operation", err)
 			}
 			ch.status = SUCCESS
 		}
@@ -83,7 +83,7 @@ func (ch *Change) Apply(db interfaces.Database, cache interfaces.Cache) error {
 			if err != nil {
 				ch.status = FAILURE
 				ch.err = err
-				return ez.New(op+".UPDATE", ez.EINTERNAL, "Database: Could apply update operation", err)
+				return ez.New(op+".UPDATE", ez.EINTERNAL, "Database: Could not apply update operation", err)
 			}
 			ch.status = SUCCESS
 		}
@@ -93,7 +93,7 @@ func (ch *Change) Apply(db interfaces.Database, cache interfaces.Cache) error {
 			if err != nil {
 				ch.status = FAILURE
 				ch.err = err
-				return ez.New(op+".UPDATE", ez.EINTERNAL, "Cache: Could apply set operation", err)
+				return ez.New(op+".UPDATE", ez.EINTERNAL, "Cache: Could not apply set operation", err)
 			}
 			ch.status = SUCCESS
 		}
@@ -103,7 +103,7 @@ func (ch *Change) Apply(db interfaces.Database, cache interfaces.Cache) error {
 			if err != nil {
 				ch.status = FAILURE
 				ch.err = err
-				return ez.New(op+".DELETE", ez.EINTERNAL, "Database: Could apply delete operation", err)
+				return ez.New(op+".DELETE", ez.EINTERNAL, "Database: Could not apply delete operation", err)
 			}
 			ch.status = SUCCESS
 		}
@@ -113,7 +113,7 @@ func (ch *Change) Apply(db interfaces.Database, cache interfaces.Cache) error {
 			if err != nil {
 				ch.status = FAILURE
 				ch.err = err
-				return ez.New(op+".DELETE", ez.EINTERNAL, "Cache: Could apply delete operation", err)
+				return ez.New(op+".DELETE", ez.EINTERNAL, "Cache: Could not apply delete operation", err)
 			}
 			ch.status = SUCCESS
 		}
