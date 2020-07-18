@@ -128,7 +128,6 @@ func (db *DB) Query(mList interface{}, model interfaces.Model, query []string) e
 	}
 
 	if result.RowsReturned() == 0 {
-		fmt.Println("we dont get here right?")
 		msg := fmt.Sprintf("Could not find any %s with query %s", model.GetSchema().Name, q)
 		return ez.New(op, ez.ENOTFOUND, msg, nil)
 	}
