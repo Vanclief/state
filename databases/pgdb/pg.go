@@ -172,7 +172,7 @@ func (db *DB) Delete(m interfaces.Model) error {
 	const op = "PG.DB.Delete"
 
 	err := db.pg.Delete(m)
-	fmt.Println("Delete err", err)
+	fmt.Println("Delete err", err, m.GetID(), m.GetSchema().Name)
 	if err != nil {
 		switch err.Error() {
 		default:
