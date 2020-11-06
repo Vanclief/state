@@ -104,10 +104,14 @@ func TestStage(t *testing.T) {
 func TestCommit(t *testing.T) {
 	// Test Setup
 	state := NewMockManager()
-	user := user.New("1", "Franco", "franco@gmail.com")
+	user1 := user.New("1", "Franco", "franco@gmail.com")
+	user2 := user.New("2", "Jack", "jack@gmail.com")
+	user3 := user.New("3", "Jacob", "jacob@gmail.com")
 
 	// Should be able to apply insert
-	state.Stage(user, "insert")
+	state.Stage(user1, "insert")
+	state.Stage(user2, "insert")
+	state.Stage(user3, "insert")
 	err := state.Commit()
 	assert.Nil(t, err)
 
@@ -115,13 +119,19 @@ func TestCommit(t *testing.T) {
 	assert.Len(t, state.Status(), 0)
 
 	// Should be able to apply update
-	user.Name = "Not Franco"
-	state.Stage(user, "update")
+	user1.Name = "Not Franco"
+	user2.Name = "Not Jack"
+	user3.Name = "Not Jacob"
+	state.Stage(user1, "update")
+	state.Stage(user2, "update")
+	state.Stage(user3, "update")
 	err = state.Commit()
 	assert.Nil(t, err)
 
 	// Should be able to apply delete
-	state.Stage(user, "delete")
+	state.Stage(user1, "delete")
+	state.Stage(user2, "delete")
+	state.Stage(user3, "delete")
 	err = state.Commit()
 	assert.Nil(t, err)
 }
