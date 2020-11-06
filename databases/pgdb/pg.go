@@ -143,7 +143,7 @@ func (db *DB) Insert(m interfaces.Model) error {
 	if err != nil {
 		switch err.Error() {
 		default:
-			errMsg := fmt.Sprintf("Error inserting %s into %s", m.GetID(), m.GetSchema())
+			errMsg := fmt.Sprintf("Error inserting %s into %s", m.GetID(), m.GetSchema().Name)
 			return ez.New(op, ez.EINTERNAL, errMsg, err)
 		}
 	}
@@ -159,7 +159,7 @@ func (db *DB) Update(m interfaces.Model) error {
 	if err != nil {
 		switch err.Error() {
 		default:
-			errMsg := fmt.Sprintf("Error updating %s from %s", m.GetID(), m.GetSchema())
+			errMsg := fmt.Sprintf("Error updating %s from %s", m.GetID(), m.GetSchema().Name)
 			return ez.New(op, ez.EINTERNAL, errMsg, err)
 		}
 	}
@@ -175,7 +175,7 @@ func (db *DB) Delete(m interfaces.Model) error {
 	if err != nil {
 		switch err.Error() {
 		default:
-			errMsg := fmt.Sprintf("Error deleting %s from %s", m.GetID(), m.GetSchema())
+			errMsg := fmt.Sprintf("Error deleting %s from %s", m.GetID(), m.GetSchema().Name)
 			return ez.New(op, ez.EINTERNAL, errMsg, err)
 		}
 	}
