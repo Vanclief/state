@@ -153,6 +153,26 @@ func (db *DB) Query(mList interface{}, model interfaces.Model, query []string) e
 	return nil
 }
 
+// RawQuery returns a list of models from the database that satisfy a Raw Query
+func (db *DB) RawQuery(mList interface{}, model interfaces.Model, rawQuery []string) error {
+	const op = "PG.DB.RawQuery"
+
+	result, err := db.pg.Query(mList, rawQuery, nil)
+	if err != nil || result == nil {
+		switch err.Error() {
+		default:
+			return ez.New(op, ez.EINTERNAL, "Error making query to the database", err)
+		}
+	}
+
+	if result.RowsReturned() == 0 {
+		msg := fmt.Sprintf("Could not find any %s with query %s", model.GetSchema().Name, rawQuery)
+		return ez.New(op, ez.ENOTFOUND, msg, nil)
+	}
+
+	return nil
+}
+
 // Insert adds a model into the database
 func (db *DB) Insert(m interfaces.Model) error {
 	const op = "PG.DB.Insert"

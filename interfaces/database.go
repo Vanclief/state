@@ -9,6 +9,8 @@ type Database interface {
 	QueryOne(Model, string) error
 	// Query returns all Model from the database that satisfy a Query
 	Query(interface{}, Model, []string) error
+	// RawQuery returns all Model from the database that satisfy a raw SQL Query
+	RawQuery(interface{}, Model, []string) error
 	// Insert a model into the database using its ID as PK
 	Insert(Model) error
 	// Update an existing model into the database
