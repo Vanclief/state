@@ -99,6 +99,24 @@ func (m *Manager) Query(mList interface{}, model interfaces.Model, query ...stri
 	return nil
 }
 
+// RawQuery receives a model and a raw query. Will return all models that satisfies the
+// raw query.
+func (m *Manager) RawQuery(mList interface{}, model interfaces.Model, query ...string) error {
+	const op = "Manager.RawQuery"
+
+	if m.DB != nil {
+		m.log(op, "Query", query)
+
+		err := m.DB.RawQuery(mList, model, query)
+		if err != nil {
+			m.logError(op, err, "Source", "DB", "ID", query)
+			return ez.New(op, ez.ErrorCode(err), ez.ErrorMessage(err), err)
+		}
+	}
+
+	return nil
+}
+
 // Stage setups a model for changes, no change will be applied until State.Commit() is run
 func (m *Manager) Stage(model interfaces.Model, operation string) error {
 	const op = "Manager.Stage"
